@@ -9,3 +9,9 @@ create table history(
 	played bit default 0,
 	reqtime timestamp
 );
+
+drop table checkhistory;
+
+create table checkhistory(
+	checktime timestamp
+);
