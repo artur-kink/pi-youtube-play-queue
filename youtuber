@@ -1,0 +1,15 @@
+#!/bin/bash
+
+DLF=dl
+
+# download from youtube, output DONE when done
+# write STDERR to log file
+youtube-dl \
+		http://youtube.com/watch?v="$1" \
+		-f 22/18/17/13 \
+        --max-filesize $(df . | tail -n 1 | awk '{MX=600*1024*1024;SZ=($4-30720)*1024; if (MX < SZ){print MX}else{print SZ}}') \
+		-o $DLF/"$1" |
+		tee $DLF/"$1.log"
+        if [[ "$(grep Aborting $DLF/"$1.log" | wc -l)" -eq 0 ]]; then
+            echo "DONE $1" >> $DLF/"$1.log"
+        fi

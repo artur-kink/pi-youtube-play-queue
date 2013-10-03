@@ -1,66 +1,40 @@
 #!/bin/bash
 
-idle=0
+PLAYER=omxplayer
+PATH=.:$PATH
+ERR=/dev/null
+SL=2
+DLF=dl
 
-while :
-do
-clear
-echo "."
-
-#pop video off top
-wget jmpmain.com/pop.php -O videos.txt 2>/dev/null
-
-if [ -s videos.txt ]
-then
-
-#get next video in queue
-wget jmpmain.com/top.php -O next.txt 2>/dev/null
-
-mv dlnext dlvid 2>/dev/null
-
-#if next video exists in queue download it in background
-if [ -s next.txt ]
-then
-	youtube-dl http://youtube.com/watch?v=`cat next.txt` -f 22/18/17/13 -o dlnext &>/dev/null &
-fi
-
-if [ -a dlvid ]
-then
-	omxplayer dlvid &>/dev/null
-else
-	#download current video
-	youtube-dl http://youtube.com/watch?v=`cat videos.txt` -f 22/18/17/13 -o dlvid
-	clear
-
-    # play downloaded video. Repeat forever if requested.
-    # TODO: make repeating not suck.
-    if [ "$1" == "--repeat" ]
-    then
-        echo "repeating forever, ctrl+c twice to exit"
-        while true
-        do
-            omxplayer dlvid &>/dev/null
-        done
-    else
-        omxplayer dlvid &>/dev/null
+while :; do
+	VID="$(head -n 1 videos.txt)"
+#	if [[ -z "$VID" ]]; then
+#		echo "Running default playlist" >&2
+#		$PLAYER --vol "-100" "videos/`ls videos | shuf | head -1`" &>$ERR
+#	else
+        if [[ -z "$VID" ]]; then
+    		echo "Running default playlist" >&2
+	    	$PLAYER --vol "-100" "videos/`ls videos | shuf | head -1`" &>$ERR
+        else
+        echo "Loaded $VID" >&2
+        if [[ "$(grep -i -f <(echo "ERROR";echo "Aborted") "$DLF/$VID.log" 2>$ERR | wc -l)" -gt 0 ]]; then
+            echo "Error downloading $VID" >&2
+		    sed -i 1d videos.txt
+			continue
+		fi
+		if [[ "$(grep DONE "$DLF/$VID.log" 2>$ERR | wc -l)" -gt 0 ]]; then
+            echo "Playing $VID" >&2
+		    sed -i 1d videos.txt
+            clear
+            echo "$VID" > nowplaying.txt
+			$PLAYER --vol "0" $DLF/"$VID"
+            rm nowplaying.txt
+            touch nowplaying.txt
+            rm $DLF/"$VID".log
+        else
+    		echo "Running default playlist" >&2
+	    	$PLAYER --vol "-100" "videos/`ls videos | shuf | head -1`" &>$ERR
+        fi
     fi
-
-fi
-
-idle=0
-
-rm dlvid 2>/dev/null
-rm videos.txt next.txt 2>/dev/null
-
-else
-	let idle=$idle+1
-
-	if [ $idle -gt 12 ]
-	then
-		omxplayer --vol "-1700" "videos/`ls videos | shuf | head -1`" &>/dev/null
-	else
-		sleep 5
-	fi
-fi
-
+    sleep $SL
 done

@@ -1,0 +1,35 @@
+#!/bin/bash
+
+ERR=/dev/null
+DLF=dl
+PATH=.:$PATH
+SL=2
+
+while :; do
+	if [[ ! -s videos.txt ]]; then
+		wget http://74.121.151.158/pop.php -O videos.txt 2>$ERR
+    fi
+    VID="$(head -n 1 videos.txt)"
+    if [[ ! -z "$VID" ]]; then
+    if [[ "$(grep DONE "$DLF/$VID.log" 2>$ERR)" == ""  && "$(ps ux | grep youtuber | grep -v grep)" == "" ]]; then
+        echo "Downloading $VID"
+        ./youtuber "$VID"
+        if [[ "$(grep -i Aborting $DLF/"$VID".log | wc -l)" -gt 0 ]]; then
+            echo "File too big, clearing space"
+            # try to clear space
+            ls -1 $DLF/* | grep -v -f nowplaying.txt | 
+            while read F; do
+                rm "./$F"
+            done
+            echo "Space cleared, trying again"
+            ./youtuber "$VID"
+            if [[ "$(grep -i 629145600 $DLF/"$VID".log | wc -l)" -gt 0 ]]; then
+#            if [[ "$(grep -i Aborting $DLF/"$VID".log | wc -l)" -gt 0 ]]; then
+                sed -i 1d videos.txt
+            fi
+
+        fi
+    fi
+fi
+    sleep $SL
+done
