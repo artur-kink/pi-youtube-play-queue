@@ -11,5 +11,6 @@ youtube-dl \
 		-o $DLF/"$1" |
 		tee $DLF/"$1.log"
         if [[ "$(grep Aborting $DLF/"$1.log" | wc -l)" -eq 0 ]]; then
-            echo "DONE $1" >> $DLF/"$1.log"
+            echo "DONE $1"
+			echo "DONE $1" >> $DLF/"$1.log"
         fi
