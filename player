@@ -8,13 +8,10 @@ DLF=dl
 
 while :; do
 	VID="$(head -n 1 videos.txt)"
-#	if [[ -z "$VID" ]]; then
-#		echo "Running default playlist" >&2
-#		$PLAYER --vol "-100" "videos/`ls videos | shuf | head -1`" &>$ERR
-#	else
         if [[ -z "$VID" ]]; then
+			clear
     		echo "Running default playlist" >&2
-	    	$PLAYER --vol "-100" "videos/`ls videos | shuf | head -1`" &>$ERR
+	    	$PLAYER -o hdmi "videos/`ls videos | shuf | head -1`" &>$ERR
         else
         echo "Loaded $VID" >&2
         if [[ "$(grep -i -f <(echo "ERROR";echo "Aborted") "$DLF/$VID.log" 2>$ERR | wc -l)" -gt 0 ]]; then
@@ -33,7 +30,7 @@ while :; do
             rm $DLF/"$VID".log
         else
     		echo "Running default playlist" >&2
-	    	$PLAYER --vol "-100" "videos/`ls videos | shuf | head -1`" &>$ERR
+	    	$PLAYER -o hdmi "videos/`ls videos | shuf | head -1`" &>$ERR
         fi
     fi
     sleep $SL
