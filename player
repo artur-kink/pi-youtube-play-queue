@@ -5,26 +5,27 @@ PATH=.:$PATH
 ERR=/dev/null
 SL=2
 DLF=dl
+YOUTUBE="http://www.youtube.com/watch?v="
 
 while :; do
 	VID="$(head -n 1 videos.txt)"
-        if [[ -z "$VID" ]]; then
-			clear
-    		echo "Running default playlist" >&2
-	    	$PLAYER -o hdmi "videos/`ls videos | shuf | head -1`" &>$ERR
-        else
-        echo "Loaded $VID" >&2
+    if [[ -z "$VID" ]]; then
+		clear
+    	echo "Running default playlist" >&2
+		$PLAYER -o hdmi "videos/`ls videos | shuf | head -1`" &>$ERR
+    else
+        echo "Loading $VID" >&2
         if [[ "$(grep -i -f <(echo "ERROR";echo "Aborted") "$DLF/$VID.log" 2>$ERR | wc -l)" -gt 0 ]]; then
             echo "Error downloading $VID" >&2
 		    sed -i 1d videos.txt
 			continue
 		fi
 		if [[ "$(grep DONE "$DLF/$VID.log" 2>$ERR | wc -l)" -gt 0 ]]; then
-            echo "Playing $VID" >&2
 		    sed -i 1d videos.txt
             clear
+			echo "Now Playing: "$(youtube-dl -e $YOUTUBE$VID)" ($VID)" >&2
             echo "$VID" > nowplaying.txt
-			$PLAYER --vol "0" $DLF/"$VID"
+			$PLAYER --vol "0" $DLF/"$VID" &>$ERR
             rm nowplaying.txt
             touch nowplaying.txt
             rm $DLF/"$VID".log
