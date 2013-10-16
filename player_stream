@@ -10,14 +10,14 @@ while :; do
     	echo "Running default playlist" >&2
 		$PLAYER -o hdmi "videos/`ls videos | shuf | head -1`" &>$ERR
     else
-		VV="$(youtube-dl -g "$VID" 2>&1)"
+		VV="$(youtube-dl -e -g "$VID" 2>&1)"
 		if [[ "$(echo "$VV" | grep -o ERROR)" == "ERROR" ]]; then
 			clear
-			echo "Error playing $VID" >&2
+			echo "Error playing $(echo "$VV" | head -n 1)" >&2
 		else
 			clear
-        	echo "Playing $VID" >&2
-			$PLAYER "$VV" &>$ERR
+			echo "Playing $(echo "$VV" | head -n 1)" >&2
+			$PLAYER "$(echo "$VV" | tail -n 1)" &>$ERR
 		fi
     fi
 done
