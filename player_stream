@@ -12,10 +12,12 @@ while :; do
     else
 		VV="$(youtube-dl -g "$VID" 2>&1)"
 		if [[ "$(echo "$VV" | grep -o ERROR)" == "ERROR" ]]; then
+			clear
 			echo "Error playing $VID" >&2
 		else
+			clear
         	echo "Playing $VID" >&2
-			$PLAYER "$VV"
+			$PLAYER "$VV" &>$ERR
 		fi
     fi
 done
