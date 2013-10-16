@@ -1,0 +1,21 @@
+#!/bin/bash
+
+PLAYER=omxplayer
+ERR=/dev/null
+
+while :; do
+	VID="$(wget http://74.121.151.158/pop.php -O /dev/stdout 2>$ERR)"
+    if [[ -z "$VID" ]]; then
+		clear
+    	echo "Running default playlist" >&2
+		$PLAYER -o hdmi "videos/`ls videos | shuf | head -1`" &>$ERR
+    else
+		VV="$(youtube-dl -g "$VID" 2>&1)"
+		if [[ "$(echo "$VV" | grep -o ERROR)" == "ERROR" ]]; then
+			echo "Error playing $VID" >&2
+		else
+        	echo "Playing $VID" >&2
+			$PLAYER "$VV"
+		fi
+    fi
+done
