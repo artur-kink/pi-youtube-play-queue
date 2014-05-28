@@ -18,7 +18,11 @@ $results = $mysqli->query("select * from history where played = 1 order by reqti
 if($results){
 	echo "<table><tr><th></th><th>Video</th><th>Time</th></tr>";
     while($row = $results->fetch_object()){
-       echo "<tr><td><a style='color: white;' href='push.php?video=" . $row->video . "'>Replay</a></td><td><a style='color: white;' href='http://youtube.com/watch?v=" . $row->video . "'>" . $row->title . "</a></td><td>" . $row->reqtime . "</td></tr>";
+        if($row->isyoutube){
+	    echo "<tr><td><a style='color: white;' href='push.php?video=" . $row->video . "'>Replay</a></td><td><a style='color: white;' href='http://youtube.com/watch?v=" . $row->video . "'>" . $row->title . "</a></td><td>" . $row->reqtime . "</td></tr>";
+        }else{
+	    echo "<tr><td colspan=2><a style='color: white;' href='" . $row->video . "'>" . $row->title . "</a></td><td>" . $row->reqtime . "</td></tr>";
+	}
     }
 	echo "</table>";
 }

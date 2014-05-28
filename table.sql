@@ -7,7 +7,8 @@ create table history(
 	title nvarchar(255),
 	duration nvarchar(10),
 	played bit default 0,
-	reqtime timestamp
+	reqtime timestamp,
+	isyoutube bit default 1
 );
 
 drop table checkhistory;

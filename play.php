@@ -30,7 +30,7 @@ if($lastcheck){
 <br/><br/>
 Current Queue:
 <?php
-$results = $mysqli->query("select * from history where played = 0;");
+$results = $mysqli->query("select * from history where played = 0 order by id desc;");
 if($results){
     $numrows = mysqli_num_rows($results);
     if($numrows == 0){
@@ -38,20 +38,28 @@ if($results){
     }
 
     while($row = $results->fetch_object()){
-        echo "<div style='margin-top: 5px;'>" . $row->title . "</div>";
+	if($row->isyoutube){
+            echo "<div style='margin-top: 5px;'><a style='color: white;' href='http://youtube.com/watch?v=" . $row->video . "'>" . $row->title . "</a> - " . $row->reqtime . "</div>";
+        }else{
+            echo "<div style='margin-top: 5px;'><a style='color: white;' href='" . $row->video . "'>" . $row->title . "</a> - " . $row->reqtime . "</div>";
+        }
     }
 }
 ?>
 	</div>
 	<div style="margin-top: 20px;">
-	Recently Played:
+	Recently Downloaded:
 <?php
 
-$results = $mysqli->query("select * from history where played = 1 order by reqtime desc limit 5;");
+$results = $mysqli->query("select * from history where played = 1 order by id desc limit 5;");
 
 if($results){
     while($row = $results->fetch_object()){
-       echo "<div style='margin-top: 5px;'><a style='color: white;' href='http://youtube.com/watch?v=" . $row->video . "'>" . $row->title . "</a> - " . $row->reqtime . "</div>";
+	if($row->isyoutube){
+       	    echo "<div style='margin-top: 5px;'><a style='color:white;' href='push.php?video=" . $row->video . "'>Replay</a><a style='margin-left: 5px; color: white;' href='http://youtube.com/watch?v=" . $row->video . "'>" . $row->title . "</a> - " . $row->reqtime . "</div>";
+    	}else{
+       	    echo "<div style='margin-top: 5px;'><a style='color: white;' href='" . $row->video . "'>" . $row->title . "</a> - " . $row->reqtime . "</div>";
+	}
     }
 }
 
@@ -59,6 +67,7 @@ $mysqli->close();
 ?>
 	<br/>
 	<a style="color: white;" href="list.php">View entire history</a>
+	<a style="color: red;" href="stats.php">Some interesting stats</a>
 	</div>
 
 </div>
